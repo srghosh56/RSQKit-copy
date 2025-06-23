@@ -15,7 +15,7 @@ training:
     url: "https://docs.gitlab.com/ee/ci/pipelines/downstream_pipelines.html#dynamic-child-pipelines"
   - name: "Docker Multi-stage Builds"
     registry: "Docker"
-    url: "https://docs.docker.com/develop/dev-best-practices/dockerfile_best_practices/#use-multi-stage-builds"
+    url: "https://docs.docker.com/build/building/multi-stage/"
 ---
 
 ## How can I efficiently test my research software across multiple compiler versions, library dependencies, and target platforms?
