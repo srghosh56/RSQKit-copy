@@ -28,51 +28,51 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 
 ### Considerations
 
-- **Resource limitations on GitHub**: Free {% tool "github-actions" %} have monthly limits and lack access to specialized hardware like GPUs or alternative CPU architectures required for performance-portable research software
-- **Available local infrastructure**: Your organization may have {% tool "gitlab-ci-cd" %} runners with specialized hardware including multiple CPU architectures (ARM, Power, AMD, Intel), GPUs (NVIDIA, AMD), HPC systems, or different operating systems (macOS, Windows)
-- **Fork contribution workflow**: Contributors often work from forks, which complicates direct integration with external CI systems, especially important for open-source research projects with distributed contributors
-- **GitLab Premium limitations**: GitLab's native GitHub integration requires Premium edition and has limitations with fork pull requests, making it unsuitable for many research organizations
-- **Security considerations**: External contributors need access to CI results without compromising internal infrastructure security
-- **Webhook reliability**: Ensuring consistent communication between GitHub events and GitLab CI execution
-- **Status reporting complexity**: Maintaining clear CI status visibility on GitHub while running on external infrastructure
+- Resource limitations on GitHub: Free {% tool "github-actions" %} have monthly limits and lack access to specialized hardware like GPUs or alternative CPU architectures required for performance-portable research software
+- Available local infrastructure: Your organization may have {% tool "gitlab-ci-cd" %} runners with specialized hardware including multiple CPU architectures (ARM, Power, AMD, Intel), GPUs (NVIDIA, AMD), HPC systems, or different operating systems (macOS, Windows)
+- Fork contribution workflow: Contributors often work from forks, which complicates direct integration with external CI systems, especially important for open-source research projects with distributed contributors
+- GitLab Premium limitations: GitLab's native GitHub integration requires Premium edition and has limitations with fork pull requests, making it unsuitable for many research organizations
+- Security considerations: External contributors need access to CI results without compromising internal infrastructure security
+- Webhook reliability: Ensuring consistent communication between GitHub events and GitLab CI execution
+- Status reporting complexity: Maintaining clear CI status visibility on GitHub while running on external infrastructure
 
 ### Solutions
 
-#### **Repository Mirroring Infrastructure**
+#### Repository Mirroring Infrastructure
 
-- **Implement GitLab native project mirroring**: Configure {% tool "gitlab" %} to automatically synchronize your GitHub repository to a local GitLab instance. Initially mirror only local branches to maintain security and avoid unnecessary synchronization of all external forks.
+- Implement GitLab native project mirroring: Configure {% tool "gitlab" %} to automatically synchronize your GitHub repository to a local GitLab instance. Initially mirror only local branches to maintain security and avoid unnecessary synchronization of all external forks.
 
-- **Configure selective branch mirroring**: Set up mirroring rules that focus on main development branches and exclude temporary or experimental branches to reduce synchronization overhead.
+- Configure selective branch mirroring: Set up mirroring rules that focus on main development branches and exclude temporary or experimental branches to reduce synchronization overhead.
 
-- **Set up mirror monitoring**: Implement monitoring to ensure mirroring remains active and responsive, with automated alerts for synchronization failures.
+- Set up mirror monitoring: Implement monitoring to ensure mirroring remains active and responsive, with automated alerts for synchronization failures.
 
-#### **Fork Integration System**
+#### Fork Integration System
 
-- **Deploy automated fork mirroring bot**: Create a webhook-driven bot that monitors GitHub pull request events from forks and automatically creates corresponding branches in the GitLab mirror. Use systematic naming conventions such as `username-repo-feature-branch` to maintain organization and traceability.
+- Deploy automated fork mirroring bot: Create a webhook-driven bot that monitors GitHub pull request events from forks and automatically creates corresponding branches in the GitLab mirror. Use systematic naming conventions such as `username-repo-feature-branch` to maintain organization and traceability.
 
-- **Implement webhook security**: Configure webhook signatures and validation to ensure only legitimate GitHub events trigger mirroring operations, preventing unauthorized access to your internal GitLab infrastructure.
+- Implement webhook security: Configure webhook signatures and validation to ensure only legitimate GitHub events trigger mirroring operations, preventing unauthorized access to your internal GitLab infrastructure.
 
-- **Handle fork branch lifecycle**: Implement automated cleanup of mirrored fork branches when corresponding pull requests are closed or merged, maintaining repository hygiene.
+- Handle fork branch lifecycle: Implement automated cleanup of mirrored fork branches when corresponding pull requests are closed or merged, maintaining repository hygiene.
 
-#### **CI Status Integration**
+#### CI Status Integration
 
-- **Configure bidirectional status reporting**: Implement a system that sends GitLab pipeline status back to GitHub using commit hashes for identification. This ensures pull request status checks are properly updated regardless of the execution platform.
+- Configure bidirectional status reporting: Implement a system that sends GitLab pipeline status back to GitHub using commit hashes for identification. This ensures pull request status checks are properly updated regardless of the execution platform.
 
-- **Set up detailed status descriptions**: Provide clear, descriptive status messages that indicate the testing platform, job types, and specific failure reasons to help developers understand CI results.
+- Set up detailed status descriptions: Provide clear, descriptive status messages that indicate the testing platform, job types, and specific failure reasons to help developers understand CI results.
 
-- **Implement status aggregation**: For complex pipelines with multiple stages, aggregate status information to provide clear pass/fail indicators while maintaining access to detailed logs.
+- Implement status aggregation: For complex pipelines with multiple stages, aggregate status information to provide clear pass/fail indicators while maintaining access to detailed logs.
 
-#### **Access Management and Security**
+#### Access Management and Security
 
-- **Establish guest access procedures**: Create documented procedures for external contributors to access GitLab CI logs and results, including temporary guest access workflows that maintain security boundaries.
+- Establish guest access procedures: Create documented procedures for external contributors to access GitLab CI logs and results, including temporary guest access workflows that maintain security boundaries.
 
-- **Configure permission mapping**: Establish clear mapping between GitHub repository permissions and GitLab project access levels to ensure appropriate access control.
+- Configure permission mapping: Establish clear mapping between GitHub repository permissions and GitLab project access levels to ensure appropriate access control.
 
-- **Implement audit logging**: Maintain comprehensive logs of all cross-platform CI activities for security monitoring and troubleshooting.
+- Implement audit logging: Maintain comprehensive logs of all cross-platform CI activities for security monitoring and troubleshooting.
 
-#### **Infrastructure Configuration**
+#### Infrastructure Configuration
 
-- **Deploy specialized GitLab runners**: Configure runners with the specific hardware configurations your project requires:
+- Deploy specialized GitLab runners: Configure runners with the specific hardware configurations your project requires:
 
 | Runner Type | Hardware Configuration | Use Case |
 |-------------|----------------------|----------|
@@ -82,17 +82,17 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 | ARM | ARM64, 16 GB RAM | Cross-platform validation |
 | PowerPC | ppc64le, 64 GB RAM | HPC compatibility |
 
-- **Configure runner tagging**: Implement comprehensive tagging systems that allow jobs to target specific hardware configurations while maintaining flexibility for resource allocation.
+- Configure runner tagging: Implement comprehensive tagging systems that allow jobs to target specific hardware configurations while maintaining flexibility for resource allocation.
 
-- **Set up runner pools**: Organize runners into pools based on hardware capabilities and project requirements to ensure fair resource distribution across multiple projects.
+- Set up runner pools: Organize runners into pools based on hardware capabilities and project requirements to ensure fair resource distribution across multiple projects.
 
-#### **Monitoring and Maintenance**
+#### Monitoring and Maintenance
 
-- **Implement comprehensive monitoring**: Monitor webhook processing, mirroring bot health, runner availability, and pipeline execution metrics to ensure reliable service.
+- Implement comprehensive monitoring: Monitor webhook processing, mirroring bot health, runner availability, and pipeline execution metrics to ensure reliable service.
 
-- **Configure automated alerts**: Set up alerting for critical failures in the integration chain, including mirroring delays, webhook processing errors, and runner unavailability.
+- Configure automated alerts: Set up alerting for critical failures in the integration chain, including mirroring delays, webhook processing errors, and runner unavailability.
 
-- **Establish maintenance procedures**: Create documented procedures for routine maintenance, including runner updates, bot deployments, and mirror configuration changes.
+- Establish maintenance procedures: Create documented procedures for routine maintenance, including runner updates, bot deployments, and mirror configuration changes.
 
 ## How do I ensure reliable integration between GitHub and GitLab CI systems?
 
@@ -102,24 +102,24 @@ Maintaining a stable, reliable integration between GitHub repositories and GitLa
 
 ### Considerations
 
-- **Network reliability**: Communication between GitHub and GitLab may experience intermittent failures, requiring robust retry mechanisms
-- **Authentication management**: Maintaining valid authentication tokens across both platforms while ensuring security
-- **Rate limiting**: Both GitHub and GitLab APIs have rate limits that must be respected to avoid service interruptions
-- **Error propagation**: Failures in any part of the integration chain should be clearly communicated to developers
-- **Synchronization delays**: Mirroring introduces latency that must be managed to provide timely feedback
-- **Configuration drift**: Keeping webhook configurations and mirroring settings synchronized as projects evolve
+- Network reliability: Communication between GitHub and GitLab may experience intermittent failures, requiring robust retry mechanisms
+- Authentication management: Maintaining valid authentication tokens across both platforms while ensuring security
+- Rate limiting: Both GitHub and GitLab APIs have rate limits that must be respected to avoid service interruptions
+- Error propagation: Failures in any part of the integration chain should be clearly communicated to developers
+- Synchronization delays: Mirroring introduces latency that must be managed to provide timely feedback
+- Configuration drift: Keeping webhook configurations and mirroring settings synchronized as projects evolve
 
 ### Solutions
 
-- **Implement robust webhook processing**: Design webhook handlers with comprehensive error handling, retry logic, and dead letter queues to ensure no GitHub events are lost due to temporary failures.
+- Implement robust webhook processing: Design webhook handlers with comprehensive error handling, retry logic, and dead letter queues to ensure no GitHub events are lost due to temporary failures.
 
-- **Configure webhook redundancy**: Set up multiple webhook endpoints with failover mechanisms to ensure continuous operation even during maintenance or unexpected outages.
+- Configure webhook redundancy: Set up multiple webhook endpoints with failover mechanisms to ensure continuous operation even during maintenance or unexpected outages.
 
-- **Establish authentication token rotation**: Implement automated token rotation for both GitHub and GitLab APIs to maintain long-term reliability without manual intervention.
+- Establish authentication token rotation: Implement automated token rotation for both GitHub and GitLab APIs to maintain long-term reliability without manual intervention.
 
-- **Create comprehensive error logging**: Implement detailed logging throughout the integration pipeline to facilitate troubleshooting and identify patterns in failures.
+- Create comprehensive error logging: Implement detailed logging throughout the integration pipeline to facilitate troubleshooting and identify patterns in failures.
 
-- **Set up health monitoring dashboards**: Create monitoring dashboards that provide real-time visibility into the integration health, including webhook processing rates, mirroring delays, and CI execution metrics.
+- Set up health monitoring dashboards: Create monitoring dashboards that provide real-time visibility into the integration health, including webhook processing rates, mirroring delays, and CI execution metrics.
 
 ## How do I handle the complexity of managing both GitHub and GitLab workflows?
 
@@ -129,23 +129,23 @@ Running a hybrid GitHub-GitLab CI setup introduces workflow complexity that need
 
 ### Considerations
 
-- **Developer experience**: Contributors should have a seamless experience regardless of which CI system is running their code
-- **Debugging complexity**: Failed CI runs may require access to GitLab logs while the discussion happens on GitHub
-- **Permission management**: Different access controls between GitHub and GitLab may create permission mismatches
-- **Documentation maintenance**: Hybrid workflows require comprehensive documentation that stays current with both platforms
-- **Onboarding complexity**: New contributors need to understand both the GitHub collaboration model and GitLab CI execution environment
+- Developer experience: Contributors should have a seamless experience regardless of which CI system is running their code
+- Debugging complexity: Failed CI runs may require access to GitLab logs while the discussion happens on GitHub
+- Permission management: Different access controls between GitHub and GitLab may create permission mismatches
+- Documentation maintenance: Hybrid workflows require comprehensive documentation that stays current with both platforms
+- Onboarding complexity: New contributors need to understand both the GitHub collaboration model and GitLab CI execution environment
 
 ### Solutions
 
-- **Provide comprehensive documentation**: Create detailed documentation explaining the hybrid CI setup, including troubleshooting guides and examples specific to your research domain. Include step-by-step guides for common developer workflows.
+- Provide comprehensive documentation: Create detailed documentation explaining the hybrid CI setup, including troubleshooting guides and examples specific to your research domain. Include step-by-step guides for common developer workflows.
 
-- **Implement automated documentation updates**: Set up systems to automatically update documentation when CI configurations change, ensuring documentation remains current.
+- Implement automated documentation updates: Set up systems to automatically update documentation when CI configurations change, ensuring documentation remains current.
 
-- **Create developer onboarding guides**: Develop specific onboarding materials that explain how to work with the hybrid system, including how to access logs, interpret status messages, and request runner access.
+- Create developer onboarding guides: Develop specific onboarding materials that explain how to work with the hybrid system, including how to access logs, interpret status messages, and request runner access.
 
-- **Establish clear escalation procedures**: Document clear procedures for developers to follow when they encounter CI issues that require GitLab access or infrastructure support.
+- Establish clear escalation procedures: Document clear procedures for developers to follow when they encounter CI issues that require GitLab access or infrastructure support.
 
-- **Implement automated issue routing**: Create systems that automatically route CI-related issues to appropriate support channels based on whether they originate from GitHub or GitLab components.
+- Implement automated issue routing: Create systems that automatically route CI-related issues to appropriate support channels based on whether they originate from GitHub or GitLab components.
 
 ## References
 
