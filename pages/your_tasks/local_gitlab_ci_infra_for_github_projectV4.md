@@ -40,23 +40,23 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 
 #### Repository Mirroring Infrastructure
 
-- Implement GitLab native project mirroring: Configure {% tool "gitlab" %} to automatically synchronize your GitHub repository to a local GitLab instance. Initially mirror only local branches to maintain security and avoid unnecessary synchronization of all external forks.
+- Implement GitLab native project mirroring: Configure {% tool "gitlab" %} to automatically synchronize your GitHub repository to a local GitLab instance. See [GitLab repository mirroring documentation](https://docs.gitlab.com/ee/user/project/repository/mirror/) for setup instructions. Initially mirror only local branches to maintain security and avoid unnecessary synchronization of all external forks.
 
-- Configure selective branch mirroring: Set up mirroring rules that focus on main development branches and exclude temporary or experimental branches to reduce synchronization overhead.
+- Configure selective branch mirroring: Set up mirroring rules that focus on main development branches and exclude temporary or experimental branches to reduce synchronization overhead. Configure branch filters using [GitLab's mirroring options](https://docs.gitlab.com/ee/user/project/repository/mirror/#mirror-only-protected-branches).
 
 - Set up mirror monitoring: Implement monitoring to ensure mirroring remains active and responsive, with automated alerts for synchronization failures.
 
 #### Fork Integration System
 
-- Deploy automated fork mirroring bot: Create a webhook-driven bot that monitors GitHub pull request events from forks and automatically creates corresponding branches in the GitLab mirror. Use systematic naming conventions such as `username-repo-feature-branch` to maintain organization and traceability.
+- Deploy automated fork mirroring bot: Create a webhook-driven bot that monitors GitHub pull request events from forks and automatically creates corresponding branches in the GitLab mirror. Use [GitHub webhooks documentation](https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks) and [GitLab API for branch creation](https://docs.gitlab.com/ee/api/branches.html#create-repository-branch). Use systematic naming conventions such as `username-repo-feature-branch` to maintain organization and traceability.
 
-- Implement webhook security: Configure webhook signatures and validation to ensure only legitimate GitHub events trigger mirroring operations, preventing unauthorized access to your internal GitLab infrastructure.
+- Implement webhook security: Configure webhook signatures and validation to ensure only legitimate GitHub events trigger mirroring operations, preventing unauthorized access to your internal GitLab infrastructure. Follow [GitHub webhook security best practices](https://docs.github.com/en/developers/webhooks-and-events/webhooks/securing-your-webhooks).
 
 - Handle fork branch lifecycle: Implement automated cleanup of mirrored fork branches when corresponding pull requests are closed or merged, maintaining repository hygiene.
 
 #### CI Status Integration
 
-- Configure bidirectional status reporting: Implement a system that sends GitLab pipeline status back to GitHub using commit hashes for identification. This ensures pull request status checks are properly updated regardless of the execution platform.
+- Configure bidirectional status reporting: Implement a system that sends GitLab pipeline status back to GitHub using commit hashes for identification. Use [GitHub's commit status API](https://docs.github.com/en/rest/commits/statuses) to report build statuses from external CI systems and [GitLab CI/CD pipeline events](https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html#pipeline-events). This ensures pull request status checks are properly updated regardless of the execution platform.
 
 - Set up detailed status descriptions: Provide clear, descriptive status messages that indicate the testing platform, job types, and specific failure reasons to help developers understand CI results.
 
@@ -64,7 +64,7 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 
 #### Access Management and Security
 
-- Establish guest access procedures: Create documented procedures for external contributors to access GitLab CI logs and results, including temporary guest access workflows that maintain security boundaries.
+- Establish guest access procedures: Create documented procedures for external contributors to access GitLab CI logs and results, including temporary guest access workflows that maintain security boundaries. Configure using [GitLab project members management](https://docs.gitlab.com/ee/user/project/members/) and [guest permissions](https://docs.gitlab.com/ee/user/permissions.html#project-members-permissions) for setting up access control.
 
 - Configure permission mapping: Establish clear mapping between GitHub repository permissions and GitLab project access levels to ensure appropriate access control.
 
@@ -72,7 +72,7 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 
 #### Infrastructure Configuration
 
-- Deploy specialized GitLab runners: Configure runners with the specific hardware configurations your project requires:
+- Deploy specialized GitLab runners: Configure runners with the specific hardware configurations your project requires. Follow [GitLab Runner installation guide](https://docs.gitlab.com/runner/install/) and [runner configuration documentation](https://docs.gitlab.com/runner/configuration/):
 
 | Runner Type | Hardware Configuration | Use Case |
 |-------------|----------------------|----------|
@@ -82,13 +82,13 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 | ARM | ARM64, 16 GB RAM | Cross-platform validation |
 | PowerPC | ppc64le, 64 GB RAM | HPC compatibility |
 
-- Configure runner tagging: Implement comprehensive tagging systems that allow jobs to target specific hardware configurations while maintaining flexibility for resource allocation.
+- Configure runner tagging: Implement comprehensive tagging systems that allow jobs to target specific hardware configurations while maintaining flexibility for resource allocation. See [GitLab Runner tags documentation](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#use-tags-to-control-which-jobs-a-runner-can-run).
 
-- Set up runner pools: Organize runners into pools based on hardware capabilities and project requirements to ensure fair resource distribution across multiple projects.
+- Set up runner pools: Organize runners into pools based on hardware capabilities and project requirements to ensure fair resource distribution across multiple projects. For more information,see [GitLab Runner Tags](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section) and [Shared vs Specific Runners](https://docs.gitlab.com/ee/ci/runners/).
 
 #### Monitoring and Maintenance
 
-- Implement comprehensive monitoring: Monitor webhook processing, mirroring bot health, runner availability, and pipeline execution metrics to ensure reliable service.
+- Implement comprehensive monitoring: Monitor webhook processing, mirroring bot health, runner availability, and pipeline execution metrics to ensure reliable service. Use [GitLab's monitoring features](https://docs.gitlab.com/ee/administration/monitoring/) and [runner monitoring](https://docs.gitlab.com/runner/monitoring/).
 
 - Configure automated alerts: Set up alerting for critical failures in the integration chain, including mirroring delays, webhook processing errors, and runner unavailability.
 
@@ -115,7 +115,7 @@ Maintaining a stable, reliable integration between GitHub repositories and GitLa
 
 - Configure webhook redundancy: Set up multiple webhook endpoints with failover mechanisms to ensure continuous operation even during maintenance or unexpected outages.
 
-- Establish authentication token rotation: Implement automated token rotation for both GitHub and GitLab APIs to maintain long-term reliability without manual intervention.
+- Establish authentication token rotation: Implement automated token rotation for both GitHub and GitLab APIs to maintain long-term reliability without manual intervention. Configure using [GitHub personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) and [GitLab access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html).
 
 - Create comprehensive error logging: Implement detailed logging throughout the integration pipeline to facilitate troubleshooting and identify patterns in failures.
 
