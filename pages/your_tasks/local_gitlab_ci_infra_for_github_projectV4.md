@@ -172,13 +172,15 @@ See [GitLab Runner tags documentation](https://docs.gitlab.com/ee/ci/runners/con
 
 - Implement comprehensive monitoring: Monitor webhook processing, mirroring bot health, runner availability, and pipeline execution metrics to ensure reliable service. Use [GitLab's monitoring features](https://docs.gitlab.com/ee/administration/monitoring/) and [runner monitoring](https://docs.gitlab.com/runner/monitoring/).
 
-- Create automated monitoring scripts: Implement practical monitoring solutions that RSEs can deploy immediately. Example webhook health monitoring script:
+- Create automated monitoring scripts: Provide monitoring scripts for webhook health, GitLab API connectivity, and runner availability. These scripts can be integrated with GitLab's monitoring framework to provide practical monitoring solutions that can be deployed.
+
+  Example webhook health monitoring script:
 
   ```bash
   #!/bin/bash
   # webhook_health_monitor.sh - Monitor webhook endpoint health
   
-  WEBHOOK_URL="https://your-gitlab-instance.com/webhook"
+  WEBHOOK_URL="https://gitlab.example.com/webhook"
   ALERT_EMAIL="admin@yourorg.com"
   
   # Test webhook endpoint
@@ -189,7 +191,7 @@ See [GitLab Runner tags documentation](https://docs.gitlab.com/ee/ci/runners/con
   
   # Check GitLab API connectivity
   if ! curl -f -s -H "Authorization: Bearer $GITLAB_TOKEN" \
-       "https://your-gitlab-instance.com/api/v4/projects" > /dev/null; then
+       "https://gitlab.example.com/api/v4/projects" > /dev/null; then
       echo "GitLab API connectivity failed" | mail -s "GitLab API Alert" "$ALERT_EMAIL"
       exit 1
   fi
@@ -197,7 +199,14 @@ See [GitLab Runner tags documentation](https://docs.gitlab.com/ee/ci/runners/con
   echo "All systems healthy"
   ```
 
-  Deploy this script via cron to run every 5 minutes: ```*/5 * * * * /path/to/webhook_health_monitor.sh``` .
+  Deploy this script via cron to run every 5 minutes by adding the following line to your crontab:
+
+  ```bash
+  # Add this line to your crontab (run: crontab -e)
+  */5 * * * * /usr/local/bin/webhook_health_monitor.sh >/dev/null
+  ```
+
+  This runs the script every 5 minutes and suppresses output unless there's an error.
 
 - Configure automated alerts: Set up alerting for critical failures in the integration chain, including mirroring delays, webhook processing errors, and runner unavailability.
 
