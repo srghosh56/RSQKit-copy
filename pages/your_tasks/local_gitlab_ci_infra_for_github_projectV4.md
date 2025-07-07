@@ -24,7 +24,7 @@ training:
 
 Many research software projects are hosted on {% tool "github" %} to benefit from its large open-source community and collaboration features. However, GitHub's free CI resources may be insufficient for complex research software that requires specialized hardware (GPUs, specific CPU architectures), extensive testing matrices, or simply more computational resources than the free tier provides. Organizations often have local {% tool "gitlab" %} instances with powerful runners and specialized hardware that could address these limitations.
 
-Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly. These projects require testing across multiple hardware configurations and extensive parameter combinations that exceed GitHub's free tier capabilities, yet benefit from GitHub's collaborative ecosystem for open-source development.
+Research projects like [PIConGPU](https://github.com/ComputationalRadiationPhysics/picongpu) and [Alpaka](https://github.com/alpaka-group/alpaka) demonstrate this challenge perfectly. These projects require testing across multiple hardware configurations and extensive parameter combinations that exceed GitHub's free tier capabilities, yet benefit from GitHub's collaborative ecosystem for open-source development.
 
 ### Considerations
 
@@ -56,7 +56,7 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 
 #### CI Status Integration
 
-- Configure bidirectional status reporting: Implement a system that sends GitLab pipeline status back to GitHub using commit hashes for identification. Use [GitHub's commit status API](https://docs.github.com/en/rest/commits/statuses) to report build statuses from external CI systems and [GitLab CI/CD pipeline events](https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html#pipeline-events). This ensures pull request status checks are properly updated regardless of the execution platform.
+- Configure bidirectional status reporting: Implement a system that sends GitLab pipeline status back to GitHub using commit hashes for identification. Use [GitHub's commit status API](https://docs.github.com/en/rest/commits/statuses) to report build statuses from external CI systems and [GitLab CI/CD pipeline events](https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html#pipeline-events). See also [GitLab's GitHub integration guide](https://docs.gitlab.com/ci/ci_cd_for_external_repos/github_integration/) for comprehensive setup instructions. This ensures pull request status checks are properly updated regardless of the execution platform.
 
 - Set up detailed status descriptions: Provide clear, descriptive status messages that indicate the testing platform, job types, and specific failure reasons to help developers understand CI results.
 
@@ -64,35 +64,123 @@ Research projects like PIConGPU and Alpaka demonstrate this challenge perfectly.
 
 #### Access Management and Security
 
-- Establish guest access procedures: Create documented procedures for external contributors to access GitLab CI logs and results, including temporary guest access workflows that maintain security boundaries. Configure using [GitLab project members management](https://docs.gitlab.com/ee/user/project/members/) and [guest permissions](https://docs.gitlab.com/ee/user/permissions.html#project-members-permissions) for setting up access control.
+- Establish guest access procedures: Create documented procedures for external contributors to access GitLab CI logs and results, including temporary guest access workflows that maintain security boundaries. Note that this is primarily relevant for non-public GitLab projects where CI logs are not publicly accessible. Practical implementation:
+  1. Create a standard request template for CI log access (include GitHub username, PR number, specific job logs needed)
+  2. Set up a dedicated GitLab group for external contributors with guest permissions
+  3. Use GitLab's [temporary project access](https://docs.gitlab.com/ee/user/project/members/#add-users-to-a-project) with expiration dates (e.g., 7 days)
+  4. Automate access removal using GitLab's API or scheduled cleanup scripts
+  5. Document the process in your project's CONTRIBUTING.md file
+  Configure using [GitLab project members management](https://docs.gitlab.com/ee/user/project/members/) and [guest permissions](https://docs.gitlab.com/ee/user/permissions.html#project-members-permissions) for setting up access control.
 
-- Configure permission mapping: Establish clear mapping between GitHub repository permissions and GitLab project access levels to ensure appropriate access control.
+- Configure permission mapping: Establish clear mapping between GitHub repository permissions and GitLab project access levels to ensure appropriate access control. Practical implementation:
+  1. Document permission equivalencies:
+     - GitHub repository admins → GitLab project maintainers (can manage runners, settings)
+     - GitHub write access → GitLab developer role (can trigger pipelines, view logs)
+     - GitHub read access → GitLab reporter role (can view pipeline results only)
+  2. Create GitLab groups that mirror your GitHub team structure
+  3. Use GitLab's [SAML/LDAP integration](https://docs.gitlab.com/ee/integration/saml.html) if available for automated synchronization
+  4. Implement regular access reviews (monthly/quarterly) to ensure permissions stay synchronized
+  5. Use [GitLab's audit events](https://docs.gitlab.com/ee/administration/audit_events.html) to track permission changes
+  Document these mappings and implement them consistently using [GitLab's role-based permissions](https://docs.gitlab.com/ee/user/permissions.html#project-members-permissions).
 
-- Implement audit logging: Maintain comprehensive logs of all cross-platform CI activities for security monitoring and troubleshooting.
+- Implement audit logging: Maintain comprehensive logs of all cross-platform CI activities for security monitoring and troubleshooting. Configure logging for:
+  - Webhook processing events and failures
+  - Mirror synchronization activities
+  - User access grants and revocations
+  - Pipeline trigger events from GitHub
+  Use [GitLab's audit events](https://docs.gitlab.com/ee/administration/audit_events.html) and implement custom logging for webhook processing activities.
 
 #### Infrastructure Configuration
 
 - Deploy specialized GitLab runners: Configure runners with the specific hardware configurations your project requires. Follow [GitLab Runner installation guide](https://docs.gitlab.com/runner/install/) and [runner configuration documentation](https://docs.gitlab.com/runner/configuration/):
 
-| Runner Type | Hardware Configuration | Use Case |
-|-------------|----------------------|----------|
-| Standard | x86_64, 8-16 GB RAM | Build testing, unit tests |
-| GPU-NVIDIA | x86_64 + NVIDIA Tesla/RTX | CUDA development |
-| GPU-AMD | x86_64 + AMD Radeon | ROCm/HIP testing |
-| ARM | ARM64, 16 GB RAM | Cross-platform validation |
-| PowerPC | ppc64le, 64 GB RAM | HPC compatibility |
+The following table shows common runner configurations for research software testing. Choose hardware specifications based on your project's specific computational requirements:
 
-- Configure runner tagging: Implement comprehensive tagging systems that allow jobs to target specific hardware configurations while maintaining flexibility for resource allocation. See [GitLab Runner tags documentation](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#use-tags-to-control-which-jobs-a-runner-can-run).
+| Runner Type | Hardware Configuration | Use Case | Rationale |
+|-------------|----------------------|----------|-----------|
+| Standard | x86_64 CPU | Build testing, unit tests | Most common development environment |
+| GPU-NVIDIA | x86_64 + NVIDIA GPU | CUDA development, GPU computing | NVIDIA ecosystem dominance in HPC |
+| GPU-AMD | x86_64 + AMD GPU | ROCm/HIP testing, OpenCL | Alternative GPU vendor support |
+| ARM | ARM64 CPU | Cross-platform validation | Growing ARM adoption in HPC/cloud |
+| PowerPC | ppc64le CPU | HPC compatibility testing | Legacy HPC system support |
 
-- Set up runner pools: Organize runners into pools based on hardware capabilities and project requirements to ensure fair resource distribution across multiple projects. For more information,see [GitLab Runner Tags](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-section) and [Shared vs Specific Runners](https://docs.gitlab.com/ee/ci/runners/).
+Hardware sizing considerations:
+
+- Memory: Scale based on your largest datasets and compilation requirements (typically 8GB minimum, 32GB+ for large scientific codes)
+- Storage: Ensure sufficient space for container images, build artifacts, and test data
+- CPU cores: More cores reduce build times but increase infrastructure costs
+
+- Configure runner tagging: Implement comprehensive tagging systems that allow jobs to target specific hardware configurations while maintaining flexibility for resource allocation. Practical implementation:
+  
+  ```yaml
+  # Example runner configuration with tags
+  [[runners]]
+    name = "gpu-nvidia-runner"
+    tags = ["gpu", "nvidia", "cuda", "high-memory"]
+    
+  [[runners]]
+    name = "cpu-arm-runner"  
+    tags = ["cpu", "arm64", "cross-platform"]
+  ```
+
+  ```yaml
+  # Example job targeting specific runners
+  cuda_tests:
+    tags:
+      - gpu
+      - nvidia
+    script:
+      - nvcc --version
+      - ./run_cuda_tests.sh
+      
+  arm_build:
+    tags:
+      - cpu
+      - arm64
+    script:
+      - ./build_for_arm.sh
+  ```
+
+See [GitLab Runner tags documentation](https://docs.gitlab.com/ee/ci/runners/configure_runners.html#use-tags-to-control-which-jobs-a-runner-can-run).
+
+- Organize runners by capability: Structure your runners based on hardware capabilities and project requirements to ensure fair resource distribution. Use GitLab's runner types strategically:
+  - Shared runners: Available to all projects in your GitLab instance (good for standard builds)
+  - Group runners: Shared within specific groups/organizations (good for department-level resources)  
+  - Project-specific runners: Dedicated to individual projects (good for specialized hardware)
+  
+  Example organization strategy:
+  
+  ```yaml
+  # Example runner configuration with types
+  Shared Runners (Institute-wide):
+  ├── standard-cpu (tags: cpu, x86_64)
+  └── basic-gpu (tags: gpu, nvidia, shared)
+  
+  Group Runners (Research Group):
+  ├── high-memory-cpu (tags: cpu, high-memory, research-group)
+  └── specialized-gpu (tags: gpu, tesla, research-group)
+  
+  Project Runners (Specific Projects):
+  └── hpc-powerpc (tags: powerpc, hpc, project-specific)
+  ```
+  
+  See [GitLab runner types documentation](https://docs.gitlab.com/ee/ci/runners/runners_scope.html) for configuration guidance.
 
 #### Monitoring and Maintenance
+
+- Consider implementation complexity: The monitoring and maintenance requirements for this hybrid CI setup represent significant operational overhead that research software engineers should carefully consider. While the technical implementation provides powerful capabilities for complex research software testing, the ongoing maintenance requires dedicated infrastructure expertise and time investment that may exceed the capacity of smaller research teams.
 
 - Implement comprehensive monitoring: Monitor webhook processing, mirroring bot health, runner availability, and pipeline execution metrics to ensure reliable service. Use [GitLab's monitoring features](https://docs.gitlab.com/ee/administration/monitoring/) and [runner monitoring](https://docs.gitlab.com/runner/monitoring/).
 
 - Configure automated alerts: Set up alerting for critical failures in the integration chain, including mirroring delays, webhook processing errors, and runner unavailability.
 
 - Establish maintenance procedures: Create documented procedures for routine maintenance, including runner updates, bot deployments, and mirror configuration changes.
+  
+- Monitor webhook processing metrics: Track webhook processing success rates, maintaining above 95% success rates to ensure reliable integration. Monitor GitLab pipeline trigger delays, as synchronization delays exceeding 5 minutes may indicate infrastructure issues requiring investigation. Track runner availability across different hardware types, particularly for specialized GPU or ARM runners that may have limited availability.
+
+- Configure specific alerting thresholds: Set up alerts for webhook processing failures exceeding 3 consecutive failures, mirroring synchronization delays beyond 10 minutes, and runner unavailability lasting more than 30 minutes. Implement escalation procedures that automatically notify infrastructure administrators when automated recovery attempts fail.
+
+- Establish regular maintenance schedules: Implement weekly runner health checks, monthly authentication token validation, and quarterly review of webhook configurations. Document these procedures with specific commands and expected outputs to ensure consistency across different team members managing the infrastructure.
 
 ## How do I ensure reliable integration between GitHub and GitLab CI systems?
 
@@ -111,11 +199,49 @@ Maintaining a stable, reliable integration between GitHub repositories and GitLa
 
 ### Solutions
 
-- Implement robust webhook processing: Design webhook handlers with comprehensive error handling, retry logic, and dead letter queues to ensure no GitHub events are lost due to temporary failures.
+- Implement robust webhook processing: Design webhook handlers that reliably process GitHub webhook events. Implement error handling for downstream operations (like GitLab API calls), queue failed operations for retry, and use dead letter queues for events that cannot be processed after multiple attempts. Note that GitHub handles webhook delivery retries automatically, but you must ensure reliable processing of received events. Practical implementation:
+  1. Validate webhook signatures using GitHub's secret token
+  2. Return HTTP 200 immediately to acknowledge receipt, then process asynchronously
+  3. Use a message queue (Redis, RabbitMQ) to handle processing failures
+  4. Implement exponential backoff for failed GitLab API calls
+  5. Store failed events in a dead letter queue for manual review
+  Example using Python/Flask:
 
-- Configure webhook redundancy: Set up multiple webhook endpoints with failover mechanisms to ensure continuous operation even during maintenance or unexpected outages.
+  ```python
+  @app.route('/webhook', methods=['POST'])
+  def handle_webhook():
+      # Validate signature first
+      if not verify_signature(request):
+          return 'Unauthorized', 401
+      
+      # Queue for async processing
+      queue.enqueue(process_webhook, request.json)
+      return 'OK', 200
+  ```
 
-- Establish authentication token rotation: Implement automated token rotation for both GitHub and GitLab APIs to maintain long-term reliability without manual intervention. Configure using [GitHub personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) and [GitLab access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html).
+- Configure webhook redundancy: Set up multiple webhook endpoints with failover mechanisms to ensure continuous operation even during maintenance or unexpected outages. Practical implementation:
+  1. Configure multiple webhook URLs in your GitHub repository settings
+  2. Use a load balancer (nginx, HAProxy) to distribute webhook traffic
+  3. Deploy webhook handlers on multiple servers/containers
+  4. Implement health checks for each endpoint
+  5. Use monitoring to detect failed endpoints and route traffic accordingly
+  
+  Example nginx configuration:
+
+  ```nginx
+  upstream webhook_backends {
+      server webhook1.example.com:8080;
+      server webhook2.example.com:8080;
+  }
+  
+  server {
+      location /webhook {
+          proxy_pass http://webhook_backends;
+      }
+  }
+  ```
+
+- Establish authentication token rotation: Implement automated token rotation for both GitHub and GitLab APIs to maintain long-term reliability without manual intervention. This includes updating webhook configurations simultaneously that use these tokens for authentication as webhook authentication will fail if tokens become desynchronized between platforms. Configure using [GitHub personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) and [GitLab access tokens](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html). Automate webhook updates using [GitHub's webhook API](https://docs.github.com/en/rest/webhooks) and [GitLab's webhook API](https://docs.gitlab.com/ee/api/project_hooks.html) when tokens are rotated.
 
 - Create comprehensive error logging: Implement detailed logging throughout the integration pipeline to facilitate troubleshooting and identify patterns in failures.
 
