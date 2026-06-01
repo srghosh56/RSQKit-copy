@@ -33,7 +33,8 @@
         url: https://producingoss.com/en/index.html
     -   name: Achieving Quality in Open Source Software
         url: https://dl.acm.org/doi/10.1109/MS.2007.2
--   abbreviation: compatibility
+- &id001
+    abbreviation: compatibility
     description: 'Degree to which a product, system or component can exchange information
         with other products, systems or components, and/or perform its required functions
         while sharing the same common environment and resources. This characteristic
@@ -58,18 +59,7 @@
     source:
         name: ISO/IEC 25010 standard
         url: https://iso25000.com/index.php/en/iso-25000-standards/iso-25010
-- &id001
-    abbreviation: fairness
-    description: 'FAIRness refers to the degree to which research software adheres
-        to the FAIR principles: Findable, Accessible, Interoperable, and Reusable.
-        These principles, adapted for research software, aim to enhance the discoverability,
-        accessibility, interoperability, and reusability of software, thereby maximizing
-        its value and impact in scientific research.'
-    identifier: https://w3id.org/everse/i/dimensions/fairness
-    name: FAIRness
-    source:
-        name: Introducing the FAIR Principles for research software
-        url: https://www.nature.com/articles/s41597-022-01710-x
+- *id001
 - *id001
 - *id001
 - *id001
