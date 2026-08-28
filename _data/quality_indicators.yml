@@ -331,8 +331,7 @@
         url: https://fair-impact.github.io/RSMD-guidelines/4.Description_Classification/
     status: Active
     version: 1.0.0
-- &id001
-    abbreviation: functional_correctness
+-   abbreviation: functional_correctness
     author:
         '@type': schema:Organization
         name: University of Padova
@@ -364,9 +363,86 @@
         url: https://dome-ml.org/guidelines#evaluation-section
     status: Active
     version: 1.0.0
-- *id001
-- *id001
-- *id001
+-   abbreviation: has_active_communication_channels
+    contact:
+    -   '@type': schema:Person
+        name: Daniel Garijo
+    -   '@type': schema:Person
+        name: Andres Montero
+    created: 18-05-2026
+    description: The project has communication channels (i.e. Slack, Gitter, etc.)
+        where users and developers can discuss project-related matters and also be
+        up to date with updates, notices and other relevant information.
+    identifier:
+        '@id': https://w3id.org/everse/i/indicators/has_active_communication_channels
+    keywords:
+    - community
+    - communication channel
+    name: Project has active communication channels
+    qualityDimension:
+    -   '@id': https://w3id.org/everse/i/dimensions/maintainability
+    -   '@id': https://w3id.org/everse/i/dimensions/community
+    -   '@id': https://w3id.org/everse/i/dimensions/open_source_software
+    source:
+        identifier: https://zenodo.org/records/10647227
+        name: Task Force Sub Group 3 - Review of Software Quality Attributes and Characteristics
+        url: https://zenodo.org/records/10647227
+    status: Active
+    version: 1.0.0
+-   abbreviation: has_active_contributors
+    contact:
+    -   '@type': schema:Person
+        name: Daniel Garijo
+    -   '@type': schema:Person
+        name: Andres Montero
+    created: 18-05-2026
+    description: Contributions and/or other additions/updates to the project aren't
+        centralised on only the core maintainers, but also other contributors.
+    identifier:
+        '@id': https://w3id.org/everse/i/indicators/has_active_contributors
+    keywords:
+    - contributor
+    - active
+    name: Project has active contributors beyond core maintainers
+    qualityDimension:
+    -   '@id': https://w3id.org/everse/i/dimensions/community
+    -   '@id': https://w3id.org/everse/i/dimensions/open_source_software
+    source:
+        name: 2.5 Community
+        url: https://github.com/EVERSE-ResearchSoftware/reference-framework/blob/main/source/02-framework/community.md
+    status: Active
+    version: 1.0.0
+-   abbreviation: has_ci-tests
+    author:
+        '@type': schema:Organization
+        name: OpenSSF
+        url: https://openssf.org/
+    contact:
+    -   '@type': schema:Person
+        name: Daniel Garijo
+    -   '@type': schema:Person
+        name: Andres Montero
+    created: 23-05-2025
+    description: This indicator aims to determine if the project runs tests before
+        pull requests are merged.
+    identifier:
+        '@id': https://w3id.org/everse/i/indicators/has_ci-tests
+    keywords:
+    - continuous
+    - integration
+    - test
+    name: Software has continuous integration tests
+    qualityDimension:
+        '@id': https://w3id.org/everse/i/dimensions/maintainability
+    relevant in tiers:
+        Relevant for Analysis Code: good to have
+        Relevant for Prototype tool: good to have
+        Relevant for RS infrastructure: crucial
+    source:
+        name: 'OpenSSF Scorecard: CI-Tests'
+        url: https://github.com/ossf/scorecard/blob/cd152cb6742c5b8f2f3d2b5193b41d9c50905198/docs/checks.md#ci-tests
+    status: Active
+    version: 1.0.0
 -   abbreviation: has_contribution_guidelines
     author:
         '@type': schema:Organization
